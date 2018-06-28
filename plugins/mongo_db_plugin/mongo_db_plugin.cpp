@@ -866,14 +866,16 @@ mongo_db_plugin_impl::mongo_db_plugin_impl()
 }
 
 mongo_db_plugin_impl::~mongo_db_plugin_impl() {
-   try {
-      ilog("mongo_db_plugin shutdown in process please be patient this can take a few minutes");
-      done = true;
-      condition.notify_one();
+   if (!startup) {
+      try {
+         ilog( "mongo_db_plugin shutdown in process please be patient this can take a few minutes" );
+         done = true;
+         condition.notify_one();
 
-      consume_thread.join();
-   } catch (std::exception& e) {
-      elog("Exception on mongo_db_plugin shutdown of consume thread: ${e}", ("e", e.what()));
+         consume_thread.join();
+      } catch( std::exception& e ) {
+         elog( "Exception on mongo_db_plugin shutdown of consume thread: ${e}", ("e", e.what()));
+      }
    }
 }
 
